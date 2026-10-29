@@ -24,4 +24,11 @@ it('exports the served page and fails without writing for a missing night', () =
   expect(html).toContain('sample');
   expect(html).toContain('<style>');
   expect(html).not.toMatch(/<script\b|<link\b/i);
+
+  const unmarkedEnv: NodeJS.ProcessEnv = { ...env };
+  delete unmarkedEnv.LANE_MARKER;
+  execFileSync(process.execPath, args, { cwd: dir, env: unmarkedEnv });
+  const unmarkedHtml = readFileSync(join(dir, '.preview/index.html'), 'utf8');
+  expect(unmarkedHtml).toContain('no marker set');
+  expect(unmarkedHtml).not.toContain('DUMMY-EXPORT-MARKER');
 });
