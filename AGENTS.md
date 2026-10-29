@@ -5,6 +5,15 @@ log. Hono + JSX, rendered on the server, Node 22+.
 
 Read first: `docs/vision.md`, `docs/styleguide.md`. Decisions: `docs/adr/`.
 
+## GitHub account
+
+Use the personal GitHub account `clentfort` for this course repository, its
+issues, and all pushes. Never use the work account. Explicitly select the stored
+`clentfort` credential for `gh` operations and verify `gh api user` before
+publishing. Use HTTPS for Git network operations with that same credential,
+not the work SSH identity. Verify the commit author separately. Never print or
+commit tokens.
+
 ## Commands
 
 - `pnpm dev` / `pnpm start`: serves on `PORT` (8787). Needs `.env` (copy `.env.example`).
