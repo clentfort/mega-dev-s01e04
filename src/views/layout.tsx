@@ -11,7 +11,9 @@ const css = `
   header { display: flex; gap: 1.5rem; padding: .75rem 1.25rem; border-bottom: 1px solid var(--line); }
   header .marker { margin-left: auto; color: var(--mute); }
   main { padding: 1.25rem; max-width: 60rem; }
+  .table-scroll { overflow-x: auto; }
   table { border-collapse: collapse; width: 100%; }
+  .table-scroll th, .table-scroll td { min-width: max-content; overflow-wrap: anywhere; }
   th, td { text-align: left; padding: .35rem .75rem .35rem 0; border-bottom: 1px solid var(--line); }
   th { color: var(--mute); font-weight: normal; }
   .warn { color: var(--warn); }
