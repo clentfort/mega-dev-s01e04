@@ -32,4 +32,7 @@ After review, and only with separate approval, manually dispatch the same workfl
 `include_marker` false to overwrite that URL with the “no marker set” banner; verify it. To
 remove the public site entirely, disable GitHub Pages in repository settings.
 
+After cleanup, the preview remains at that URL with the “no marker set” banner. The completed
+[morning digest plan](docs/plans/done/2026-10-29-morning-digest.md) includes its issue list.
+
 Working on it with an agent: start at [AGENTS.md](AGENTS.md).

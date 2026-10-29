@@ -1,6 +1,6 @@
 ---
 plan: morning-digest
-status: ready
+status: done
 owner: rook
 opened: 2026-10-29
 ---
@@ -77,3 +77,16 @@ page again with `LANE_MARKER` unset (the banner reads "no marker set") and uploa
 link. Move this plan to `docs/plans/done/` with its issue list.
 
 Done when: the preview link no longer shows the lane marker.
+
+## Issues
+
+| Issue | Source |
+|-------|--------|
+| [#1 Define digest contract](https://github.com/clentfort/mega-dev-s01e04/issues/1) | §1 |
+| [#2 Run-log reader](https://github.com/clentfort/mega-dev-s01e04/issues/2) | §1 |
+| [#3 Digest HTML page](https://github.com/clentfort/mega-dev-s01e04/issues/3) | §2a |
+| [#4 JSON endpoint](https://github.com/clentfort/mega-dev-s01e04/issues/4) | §2b |
+| [#5 Board links](https://github.com/clentfort/mega-dev-s01e04/issues/5) | §2c |
+| [#6 Route tests](https://github.com/clentfort/mega-dev-s01e04/issues/6) | §2d |
+| [#7 Preview for review](https://github.com/clentfort/mega-dev-s01e04/issues/7) | §3 |
+| [#8 Preview cleanup and plan archive](https://github.com/clentfort/mega-dev-s01e04/issues/8) | §4 |
