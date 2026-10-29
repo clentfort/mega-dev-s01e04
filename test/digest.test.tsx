@@ -64,7 +64,10 @@ describe('digest routes', () => {
     expect(rows).toHaveLength(digest.rows.length);
     expect(rows[0]).toContain('alpha &amp; beta');
     expect(rows[0]).toContain('Ada &lt;ops&gt;');
-    for (const value of ['4', '3', 'ok', '2026-10-29T02:00:00+01:00', '2026-10-29T02:03:00+01:00', '—']) expect(cellValues(rows[0])).toContain(value);
+    const alphaCells = cellValues(rows[0]);
+    expect(alphaCells[2]).toBe('4');
+    expect(alphaCells[3]).toMatch(/^3(?:\D|$)/);
+    for (const value of ['ok', '2026-10-29T02:00:00+01:00', '2026-10-29T02:03:00+01:00', '—']) expect(alphaCells).toContain(value);
     // Both the high retry count and the failure must be visually marked.
     expect(rows[0]).toMatch(/\bclass=|<(?:strong|b|mark)\b/i);
     expect(rows[1]).toMatch(/\bclass=|<(?:strong|b|mark)\b/i);
