@@ -23,6 +23,12 @@ function night(content: string) {
   writeFileSync(join(runsDir, '2026-10-28.jsonl'), content);
 }
 
+function cellValues(row: string): string[] {
+  return Array.from(row.matchAll(/<td\b[^>]*>([\s\S]*?)<\/td>/gi), (match) =>
+    (match[1] ?? '').replace(/<[^>]*>/g, '').trim(),
+  );
+}
+
 function tableRows(html: string): string[] {
   const tables = html.match(/<table\b[^>]*>[\s\S]*?<\/table>/gi) ?? [];
   expect(tables).toHaveLength(1);
@@ -58,12 +64,12 @@ describe('digest routes', () => {
     expect(rows).toHaveLength(digest.rows.length);
     expect(rows[0]).toContain('alpha &amp; beta');
     expect(rows[0]).toContain('Ada &lt;ops&gt;');
-    for (const value of ['4', '3', 'ok', '2026-10-29T02:00:00+01:00', '2026-10-29T02:03:00+01:00', '—']) expect(rows[0]).toContain(value);
+    for (const value of ['4', '3', 'ok', '2026-10-29T02:00:00+01:00', '2026-10-29T02:03:00+01:00', '—']) expect(cellValues(rows[0])).toContain(value);
     // Both the high retry count and the failure must be visually marked.
     expect(rows[0]).toMatch(/\bclass=|<(?:strong|b|mark)\b/i);
     expect(rows[1]).toMatch(/\bclass=|<(?:strong|b|mark)\b/i);
     expect(rows[1]).toContain(digest.rows[1].job);
-    for (const value of ['—', '1', '0', 'fail', '2026-10-28T23:00:00-04:00', 'broken &lt;script&gt;alert(1)&lt;/script&gt; &amp; more']) expect(rows[1]).toContain(value);
+    for (const value of ['—', '1', '0', 'fail', '2026-10-28T23:00:00-04:00', 'broken &lt;script&gt;alert(1)&lt;/script&gt; &amp; more']) expect(cellValues(rows[1])).toContain(value);
     expect(html).not.toContain('<script>alert(1)</script>');
   });
 
@@ -71,6 +77,33 @@ describe('digest routes', () => {
     const server = app();
     expect((await server.request('/digest/2026-10-28')).status).toBe(404);
     expect((await server.request('/api/digest/2026-10-28')).status).toBe(404);
+  });
+
+  it('returns 404 on both routes for invalid identifiers', async () => {
+    const server = app();
+    for (const identifier of ['not-a-date', '%2e%2e%2fsecret']) {
+      for (const prefix of ['/digest/', '/api/digest/']) {
+        expect((await server.request(prefix + identifier)).status).toBe(404);
+      }
+    }
+  });
+
+  it('lists fixture nights newest first with their own event counts', async () => {
+    const event = (status: 'ok' | 'retry' | 'fail') =>
+      JSON.stringify({ at: '2026-10-28T08:00:00+02:00', job: 'fixture', status, owner: null });
+    night([event('ok'), event('retry'), event('retry')].join('\n'));
+    writeFileSync(join(runsDir, '2026-10-29.jsonl'), [event('ok'), event('ok'), event('ok'), event('fail'), event('fail')].join('\n'));
+    const response = await app().request('/');
+    expect(response.status).toBe(200);
+    const html = await response.text();
+    const entries = Array.from(html.matchAll(/<(li|tr|div)\b[^>]*>(?:(?!<\/(?:li|tr|div)>)[\s\S])*?<a\b[^>]*href=["']\/digest\/(2026-10-2[89])["'][^>]*>[\s\S]*?<\/a>(?:(?!<\/(?:li|tr|div)>)[\s\S])*?<\/\1>/gi));
+    expect(entries.map((entry) => entry[2])).toEqual(['2026-10-29', '2026-10-28']);
+    for (const [index, counts] of [[0, { ok: 3, retry: 0, fail: 2 }], [1, { ok: 1, retry: 2, fail: 0 }]] as const) {
+      const text = (entries[index]?.[0] ?? '').replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ');
+      for (const [label, count] of Object.entries(counts)) {
+        expect(text).toMatch(new RegExp(`(?:\\b${label}\\b\\s*[:=]?\\s*\\b${count}\\b|\\b${count}\\b\\s*\\b${label}\\b)`, 'i'));
+      }
+    }
   });
 
   it('renders an empty night and returns an empty digest', async () => {
