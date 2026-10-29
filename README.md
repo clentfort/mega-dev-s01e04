@@ -17,4 +17,19 @@ pnpm test
 pnpm typecheck
 ```
 
+## Public review preview
+
+`pnpm preview:export` fetches the actual digest from a temporary local server into the ignored
+`.preview/index.html`. It reads `.env` if present; the output is public-ready, so use only the
+sample run data and the issued marker. Never commit or attach the HTML or `.env`.
+
+To publish, configure GitHub Pages to use Actions, provision the repository secret `LANE_MARKER`,
+and manually dispatch the Preview deployment workflow with `include_marker` true (the default).
+Nothing deploys on a push. The public URL is https://clentfort.github.io/mega-dev-s01e04/.
+Verify the published page and send the reviewer that URL and the plan issues.
+
+After review, and only with separate approval, manually dispatch the same workflow with
+`include_marker` false to overwrite that URL with the “no marker set” banner; verify it. To
+remove the public site entirely, disable GitHub Pages in repository settings.
+
 Working on it with an agent: start at [AGENTS.md](AGENTS.md).

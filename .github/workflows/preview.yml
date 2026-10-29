@@ -1,0 +1,71 @@
+name: Preview deployment
+
+on:
+  workflow_dispatch:
+    inputs:
+      include_marker:
+        description: Include the repository marker in the public preview
+        type: boolean
+        default: true
+        required: true
+
+permissions: {}
+
+concurrency:
+  group: pages-preview
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24.22.0
+          package-manager-cache: false
+      - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+        with:
+          version: 12.16.1
+      - run: pnpm install --frozen-lockfile --ignore-scripts
+      - run: pnpm test
+      - run: pnpm typecheck
+      - name: Export preview
+        env:
+          INCLUDE_MARKER: ${{ inputs.include_marker }}
+          LANE_MARKER: ${{ inputs.include_marker && secrets.LANE_MARKER || '' }}
+        run: |
+          set -eu
+          umask 077
+          rm -rf .preview
+          if [ "$INCLUDE_MARKER" = true ]; then
+            if [ -z "$(printf '%s' "$LANE_MARKER" | tr -d '[:space:]')" ]; then
+              echo 'Required marker secret is missing or empty' >&2
+              exit 1
+            fi
+            printf 'LANE_MARKER=%s\n' "$LANE_MARKER" > .env
+          else
+            rm -f .env
+            export LANE_MARKER=''
+          fi
+          pnpm preview:export
+      - uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
+        with:
+          path: .preview/
+          retention-days: 1
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5.0.1

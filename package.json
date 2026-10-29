@@ -4,21 +4,23 @@
   "private": true,
   "license": "MIT",
   "type": "module",
+  "packageManager": "pnpm@12.16.1",
   "description": "The lane's resident service: keeps a heartbeat, serves the status board, reads the night's run log.",
   "scripts": {
     "dev": "tsx watch --env-file-if-exists=.env src/server.ts",
     "start": "tsx --env-file-if-exists=.env src/server.ts",
+    "preview:export": "tsx --env-file-if-exists=.env scripts/export-preview.ts",
     "test": "vitest run",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@hono/node-server": "^1.19.0",
-    "hono": "^4.13.8"
+    "@hono/node-server": "1.19.17",
+    "hono": "4.13.14"
   },
   "devDependencies": {
-    "@types/node": "^24.1.0",
-    "tsx": "^4.20.0",
-    "typescript": "^6.0.3",
-    "vitest": "^5.0.1"
+    "@types/node": "24.19.2",
+    "tsx": "4.23.15",
+    "typescript": "6.0.3",
+    "vitest": "5.0.5"
   }
 }
